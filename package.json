@@ -12,12 +12,15 @@
     "@huggingface/inference": "^4.7.1",
     "@pinecone-database/pinecone": "^6.1.2",
     "chart.js": "^4.5.0",
+    "d3": "^7.9.0",
+    "force-graph": "^1.50.1",
     "mongodb": "^6.18.0",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "19.1.0",
-    "react-force-graph": "^1.48.0"
+    "vis-data": "^8.0.1",
+    "vis-network": "^10.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

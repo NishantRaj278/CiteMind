@@ -17,22 +17,51 @@ export async function GET() {
       id: p.id,
       label: p.title,
       year: p.year,
+      url:
+        p.url && p.url !== "" && p.url !== "#"
+          ? p.url
+          : p.id
+          ? `https://www.semanticscholar.org/paper/${p.id}`
+          : `https://scholar.google.com/scholar?q=${encodeURIComponent(
+              p.title || "research paper"
+            )}`,
     }));
 
     // Build graph edges based on references
     const edges: { source: string; target: string }[] = [];
+    const connectedNodeIds = new Set<string>();
+
+    console.log(`Processing ${papers.length} papers for connections`);
+
     for (const paper of papers) {
       if (Array.isArray(paper.references)) {
+        console.log(
+          `Paper ${paper.id} has ${paper.references.length} references`
+        );
         for (const ref of paper.references) {
           // Only add edge if the referenced paper exists in the DB
-          if (papers.find((p) => p.id === ref)) {
+          const referencedPaper = papers.find((p) => p.id === ref);
+          if (referencedPaper) {
             edges.push({ source: paper.id, target: ref });
+            // Mark both nodes as connected
+            connectedNodeIds.add(paper.id);
+            connectedNodeIds.add(ref);
+            console.log(`Connection found: ${paper.id} -> ${ref}`);
           }
         }
       }
     }
 
-    return NextResponse.json({ nodes, edges });
+    console.log(`Total edges: ${edges.length}`);
+    console.log(`Connected nodes: ${connectedNodeIds.size}`);
+
+    // Update nodes with connection status
+    const nodesWithConnectionInfo = nodes.map((node) => ({
+      ...node,
+      isConnected: connectedNodeIds.has(node.id),
+    }));
+
+    return NextResponse.json({ nodes: nodesWithConnectionInfo, edges });
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

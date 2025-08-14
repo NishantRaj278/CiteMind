@@ -65,7 +65,7 @@ export async function GET() {
     const res = await fetch(
       `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(
         DOMAIN_QUERY
-      )}&limit=12&fields=paperId,title,abstract,authors,year,citationCount,url,references`
+      )}&limit=100&fields=paperId,title,abstract,authors,year,citationCount,url,references`
     );
 
     if (!res.ok) throw new Error(`Error fetching: ${res.statusText}`);
@@ -100,6 +100,10 @@ export async function GET() {
       paperMetadata.push({
         id: paper.paperId,
         title: paper.title,
+        authors: paper.authors,
+        year: paper.year || 0,
+        citationCount: paper.citationCount,
+        url: paper.url || "",
         references:
           paper.references?.map((r: SemanticScholarReference) => r.paperId) ||
           [],
